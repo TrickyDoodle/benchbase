@@ -101,7 +101,7 @@ CREATE TABLE history (
     h_w_id   int           NOT NULL,
     h_date   timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     h_amount decimal(6, 2) NOT NULL,
-    h_data   varchar(24)   NOT NULL,
+    h_data   varchar(24)   NOT NULL
 ) WITH (distributed_by = 'h_w_id', colocate_with = 'warehouse');
 
 CREATE TABLE oorder (
