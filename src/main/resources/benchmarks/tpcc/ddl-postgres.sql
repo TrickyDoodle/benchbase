@@ -19,7 +19,9 @@ CREATE TABLE warehouse (
     w_state    char(2)        NOT NULL,
     w_zip      char(9)        NOT NULL,
     PRIMARY KEY (w_id) 
-) WITH (distributed_by = 'w_id');
+) 
+    --WITH (distributed_by = 'w_id')
+    ;
 
 CREATE TABLE item (
     i_id    int           NOT NULL,
