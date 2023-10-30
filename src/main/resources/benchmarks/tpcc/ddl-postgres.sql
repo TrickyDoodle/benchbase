@@ -18,8 +18,8 @@ CREATE TABLE warehouse (
     w_city     varchar(20)    NOT NULL,
     w_state    char(2)        NOT NULL,
     w_zip      char(9)        NOT NULL,
-    PRIMARY KEY (w_id)
-);
+    PRIMARY KEY (w_id) 
+) WITH (distributed_by = 'w_id');
 
 CREATE TABLE item (
     i_id    int           NOT NULL,
@@ -29,6 +29,8 @@ CREATE TABLE item (
     i_im_id int           NOT NULL,
     PRIMARY KEY (i_id)
 );
+
+SELECT shardman.make_table_global('item');
 
 CREATE TABLE stock (
     s_w_id       int           NOT NULL,
@@ -51,7 +53,7 @@ CREATE TABLE stock (
     FOREIGN KEY (s_w_id) REFERENCES warehouse (w_id) ON DELETE CASCADE,
     FOREIGN KEY (s_i_id) REFERENCES item (i_id) ON DELETE CASCADE,
     PRIMARY KEY (s_w_id, s_i_id)
-);
+) WITH (distributed_by = 's_w_id', colocate_with = 'warehouse');
 
 CREATE TABLE district (
     d_w_id      int            NOT NULL,
@@ -67,7 +69,7 @@ CREATE TABLE district (
     d_zip       char(9)        NOT NULL,
     FOREIGN KEY (d_w_id) REFERENCES warehouse (w_id) ON DELETE CASCADE,
     PRIMARY KEY (d_w_id, d_id)
-);
+) WITH (distributed_by = 'd_w_id', colocate_with = 'warehouse') ;
 
 CREATE TABLE customer (
     c_w_id         int            NOT NULL,
@@ -93,7 +95,7 @@ CREATE TABLE customer (
     c_data         varchar(500)   NOT NULL,
     FOREIGN KEY (c_w_id, c_d_id) REFERENCES district (d_w_id, d_id) ON DELETE CASCADE,
     PRIMARY KEY (c_w_id, c_d_id, c_id)
-);
+) WITH (distributed_by = 'c_w_id', colocate_with = 'warehouse');
 
 CREATE TABLE history (
     h_c_id   int           NOT NULL,
@@ -106,7 +108,7 @@ CREATE TABLE history (
     h_data   varchar(24)   NOT NULL,
     FOREIGN KEY (h_c_w_id, h_c_d_id, h_c_id) REFERENCES customer (c_w_id, c_d_id, c_id) ON DELETE CASCADE,
     FOREIGN KEY (h_w_id, h_d_id) REFERENCES district (d_w_id, d_id) ON DELETE CASCADE
-);
+) WITH (distributed_by = 'h_w_id', colocate_with = 'warehouse');
 
 CREATE TABLE oorder (
     o_w_id       int       NOT NULL,
@@ -120,7 +122,7 @@ CREATE TABLE oorder (
     PRIMARY KEY (o_w_id, o_d_id, o_id),
     FOREIGN KEY (o_w_id, o_d_id, o_c_id) REFERENCES customer (c_w_id, c_d_id, c_id) ON DELETE CASCADE,
     UNIQUE (o_w_id, o_d_id, o_c_id, o_id)
-);
+) WITH (distributed_by = 'o_w_id', colocate_with = 'warehouse');
 
 CREATE TABLE new_order (
     no_w_id int NOT NULL,
@@ -128,7 +130,7 @@ CREATE TABLE new_order (
     no_o_id int NOT NULL,
     FOREIGN KEY (no_w_id, no_d_id, no_o_id) REFERENCES oorder (o_w_id, o_d_id, o_id) ON DELETE CASCADE,
     PRIMARY KEY (no_w_id, no_d_id, no_o_id)
-);
+) WITH (distributed_by = 'no_w_id', colocate_with = 'warehouse');
 
 CREATE TABLE order_line (
     ol_w_id        int           NOT NULL,
