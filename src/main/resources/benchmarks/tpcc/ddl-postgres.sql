@@ -30,7 +30,7 @@ CREATE TABLE item (
     PRIMARY KEY (i_id)
 );
 
-SELECT shardman.make_table_global('item');
+
 
 CREATE TABLE stock (
     s_w_id       int           NOT NULL,
